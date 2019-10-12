@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/wanhui/Documents/callJvmThreadpool/multithread.cpp
+cstdio
+-
+jni.h
+-
+pthread.h
+-
+
+/usr/local/jdk1.8/include/jni.h
+stdio.h
+-
+stdarg.h
+-
+jni_md.h
+/usr/local/jdk1.8/include/jni_md.h
+
+/usr/local/jdk1.8/include/linux/jni_md.h
+
