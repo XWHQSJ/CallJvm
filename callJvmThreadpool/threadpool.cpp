@@ -43,7 +43,6 @@ JNIEnv *create_vm (struct JVM *jvm) {
 
     vm_args.options = options;
     vm_args.nOptions = 3;
-    vm_args.ignoreUnrecognized = 0;
     vm_args.ignoreUnrecognized = JNI_TRUE;
     vm_args.version = JNI_VERSION_1_8;
 
