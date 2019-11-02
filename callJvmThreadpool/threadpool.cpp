@@ -2,22 +2,106 @@
 // Created by wanhui on 10/12/19.
 //
 
-#include <unistd.h>
+#include <cstdio>
 #include <cstdlib>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <iostream>
 #include <jni.h>
 #include "tpool.h"
 
 
 #define NUM_THREADS 6
 
+#define PORT 8080
+
 
 struct JVM {
     JavaVM *jvm;
 };
 
-void invoke_class(JNIEnv* env);
 
-void* jvmThreads(void *myJvm)
+void *jvmThreads(void *myJvm, char* plainsql, char* dbname);
+
+JNIEnv *create_vm(struct JVM *jvm);
+
+void invoke_class(JNIEnv* env, std::string str1, std::string str2);
+
+int socket_init();
+
+void* handle_stream(void* myJvm, void* arg);
+
+
+
+void* handle_stream(void* myJvm, void* arg)
+{
+    int server_fd = (int&)arg;
+    char buf[1024];
+    char* psql;
+    char* dbn;
+
+    read(server_fd, buf, 1024);
+    printf("%s\n", buf);
+
+    int i;
+    for(i = 0; i < strlen(buf); i++)
+    {
+        if(buf[i] == '$')
+        {
+            strncpy(psql, buf, i);
+            strncpy(dbn, buf + i + 1, strlen(buf) - i - 1);
+        }
+    }
+
+    jvmThreads(arg, psql, dbn);
+
+}
+
+int socket_init()
+{
+    int server_fd;
+    struct sockaddr_in address;
+    int opt = 1;
+
+    socklen_t addrlen = sizeof(address);
+
+    // crating socket file descriptor
+    if((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+    {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // forcefully attaching socket to the port 8080
+    if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+    {
+        perror("socketopt");
+        exit(EXIT_FAILURE);
+    }
+
+    address.sin_family = AF_INET;
+    // change the clients' address and port
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+
+    if(bind(server_fd, (struct sockaddr *)&address, addrlen) < 0)
+    {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if(listen(server_fd, 3) < 0)
+    {
+        perror("listen");
+        exit(EXIT_FAILURE);
+    }
+
+    return server_fd;
+}
+
+void* jvmThreads(void *myJvm, char* plainsql, char* dbname)
 {
     auto* myJvmptr = (struct JVM*) myJvm;
     JavaVM *jvmPtr = myJvmptr->jvm;
@@ -25,7 +109,7 @@ void* jvmThreads(void *myJvm)
     JNIEnv* env = nullptr;
 
     jvmPtr->AttachCurrentThread((void**)&(env), nullptr);
-    invoke_class(env);
+    invoke_class(env, plainsql, dbname);
     jvmPtr->DetachCurrentThread();
 
     return nullptr;
@@ -55,7 +139,7 @@ JNIEnv *create_vm (struct JVM *jvm) {
 }
 
 
-void invoke_class (JNIEnv * env) {
+void invoke_class (JNIEnv * env, char* plainsql, char* dbname) {
     jclass Main_class;
     jmethodID fun_id;
     jmethodID static_id;
@@ -80,9 +164,11 @@ void invoke_class (JNIEnv * env) {
     // test generally function student()
     hello_id = env->GetMethodID(Main_class, "<init>", "()V");
     obj1 = env->NewObject(Main_class, hello_id);
-    jstring name = env->NewStringUTF("XWH");
+    jstring plainsqlstr = env->NewStringUTF(plainsql);
+    jstring dbnamestr = env->NewStringUTF(dbname);
+
     stu_id = env->GetMethodID(Main_class, "student", "([Ljava/lang/String;)V");
-    env->CallObjectMethod(obj1, stu_id, name);
+    env->CallObjectMethod(obj1, stu_id, dbnamestr);
 }
 
 int main () {
@@ -90,7 +176,10 @@ int main () {
     JNIEnv *myEnv = create_vm (&myJvm);
 
     if (myEnv == nullptr)
-        return 1;
+    {
+        printf("create_vm failed\n");
+        exit(1);
+    }
 
     if(tpool_create(NUM_THREADS) != 0)
     {
@@ -98,15 +187,39 @@ int main () {
         exit(1);
     }
 
-    int i;
-    for(i = 0; i < 10; i++)
+    int sock = socket_init();
+    struct sockaddr_in address;
+    printf("listening...\n");
+    socklen_t len = sizeof(address);
+
+
+    // endless loop
+    while(true)
     {
-        tpool_add_work(reinterpret_cast<void *(*)(void *)>(jvmThreads), reinterpret_cast<void *>(&myJvm));
+        int sock = accept(sock, (struct sockaddr*)&address, &len);
+        if(sock < 0)
+        {
+            perror("\nAccept Failed\n");
+            continue;
+        }
+
+        tpool_add_work(reinterpret_cast<void *(*)(void *)>(handle_stream), reinterpret_cast<void *>(&myJvm), (void *)sock);
     }
 
-    sleep(2);
-    tpool_destroy();
-    myJvm.jvm->DestroyJavaVM ();
+
+
+    // only 10 tasks
+
+//    int i;
+//    for(i = 0; i < 10; i++)
+//    {
+//        tpool_add_work(reinterpret_cast<void *(*)(void *)>(jvmThreads), reinterpret_cast<void *>(&myJvm), );
+//    }
+//
+//    sleep(2);
+//    tpool_destroy();
+//    myJvm.jvm->DestroyJavaVM ();
+
 
     return 0;
 }

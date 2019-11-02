@@ -4,6 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/wanhui/CallJvm/callJvmThreadpool/client.cpp" "/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/client.cpp.o"
+  "/home/wanhui/CallJvm/callJvmThreadpool/server.cpp" "/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/server.cpp.o"
   "/home/wanhui/CallJvm/callJvmThreadpool/threadpool.cpp" "/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/threadpool.cpp.o"
   "/home/wanhui/CallJvm/callJvmThreadpool/tpool.cpp" "/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/tpool.cpp.o"
   )

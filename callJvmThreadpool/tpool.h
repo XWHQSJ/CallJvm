@@ -12,6 +12,7 @@ typedef struct tpool_work
 {
     void* (*routine)(void*);
     void *arg;
+    void *arg1;
     struct tpool_work *next;
 } tpool_work_t;
 
@@ -29,7 +30,7 @@ int tpool_create(int max_thr_num);
 
 void tpool_destroy();
 
-int tpool_add_work(void*(*routine)(void*), void* arg);
+int tpool_add_work(void*(*routine)(void*), void* arg, void* arg1);
 
 
 #endif //CALLJVMTHREADPOOL_TPOOL_H

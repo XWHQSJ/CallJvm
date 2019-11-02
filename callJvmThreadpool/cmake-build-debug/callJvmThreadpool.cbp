@@ -96,10 +96,16 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/client.cpp">
+			<Option target="main"/>
+		</Unit>
 		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/jni.h">
 			<Option target="main"/>
 		</Unit>
 		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/jni_md.h">
+			<Option target="main"/>
+		</Unit>
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/server.cpp">
 			<Option target="main"/>
 		</Unit>
 		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/threadpool.cpp">
