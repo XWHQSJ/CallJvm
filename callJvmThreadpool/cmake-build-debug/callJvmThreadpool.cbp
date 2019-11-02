@@ -8,28 +8,28 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug"/>
+				<Option working_dir="/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug"/>
+				<Option working_dir="/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="main">
-				<Option output="/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/main" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug"/>
+				<Option output="/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/main" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
@@ -38,8 +38,8 @@
 					<Add option="-D_REENTRANT"/>
 					<Add option="-D_FILE_OFFSET_BITS=64"/>
 					<Add option="-DTIXML_USE_STL"/>
-					<Add directory="/usr/local/jdk1.8/include"/>
-					<Add directory="/usr/local/jdk1.8/include/linux"/>
+					<Add directory="/usr/local/java/include"/>
+					<Add directory="/usr/local/java/include/linux"/>
 					<Add directory="/usr/include/c++/7"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
 					<Add directory="/usr/include/c++/7/backward"/>
@@ -50,15 +50,15 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 main"/>
-					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 main"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="main/fast">
-				<Option output="/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/main" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug"/>
+				<Option output="/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/main" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
@@ -67,8 +67,8 @@
 					<Add option="-D_REENTRANT"/>
 					<Add option="-D_FILE_OFFSET_BITS=64"/>
 					<Add option="-DTIXML_USE_STL"/>
-					<Add directory="/usr/local/jdk1.8/include"/>
-					<Add directory="/usr/local/jdk1.8/include/linux"/>
+					<Add directory="/usr/local/java/include"/>
+					<Add directory="/usr/local/java/include/linux"/>
 					<Add directory="/usr/include/c++/7"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
 					<Add directory="/usr/include/c++/7/backward"/>
@@ -79,39 +79,39 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 main/fast"/>
-					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 main/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug"/>
+				<Option working_dir="/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j2 -f &quot;/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/wanhui/Documents/callJvmThreadpool/jni.h">
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/jni.h">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="/home/wanhui/Documents/callJvmThreadpool/jni_md.h">
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/jni_md.h">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="/home/wanhui/Documents/callJvmThreadpool/threadpool.cpp">
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/threadpool.cpp">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="/home/wanhui/Documents/callJvmThreadpool/tpool.cpp">
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/tpool.cpp">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="/home/wanhui/Documents/callJvmThreadpool/tpool.h">
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/tpool.h">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="/home/wanhui/Documents/callJvmThreadpool/CMakeLists.txt">
+		<Unit filename="/home/wanhui/CallJvm/callJvmThreadpool/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>

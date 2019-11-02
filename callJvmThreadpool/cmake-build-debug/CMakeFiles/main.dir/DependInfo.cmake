@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/wanhui/Documents/callJvmThreadpool/threadpool.cpp" "/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/threadpool.cpp.o"
-  "/home/wanhui/Documents/callJvmThreadpool/tpool.cpp" "/home/wanhui/Documents/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/tpool.cpp.o"
+  "/home/wanhui/CallJvm/callJvmThreadpool/threadpool.cpp" "/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/threadpool.cpp.o"
+  "/home/wanhui/CallJvm/callJvmThreadpool/tpool.cpp" "/home/wanhui/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/tpool.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -19,8 +19,8 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/usr/local/jdk1.8/include"
-  "/usr/local/jdk1.8/include/linux"
+  "/usr/local/java/include"
+  "/usr/local/java/include/linux"
   )
 
 # Targets to which this target links.

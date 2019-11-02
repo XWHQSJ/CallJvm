@@ -6,21 +6,27 @@
 
 #IncludeRegexTransform: 
 
-/home/wanhui/Documents/callJvmThreadpool/multithread.cpp
-cstdio
+/home/wanhui/CallJvm/callJvmThreadpool/threadpool.cpp
+unistd.h
+-
+cstdlib
 -
 jni.h
 -
+tpool.h
+/home/wanhui/CallJvm/callJvmThreadpool/tpool.h
+
+/home/wanhui/CallJvm/callJvmThreadpool/tpool.h
 pthread.h
 -
 
-/usr/local/jdk1.8/include/jni.h
+/usr/local/java/include/jni.h
 stdio.h
 -
 stdarg.h
 -
 jni_md.h
-/usr/local/jdk1.8/include/jni_md.h
+/usr/local/java/include/jni_md.h
 
-/usr/local/jdk1.8/include/linux/jni_md.h
+/usr/local/java/include/linux/jni_md.h
 

@@ -3,7 +3,7 @@ project(callJvmThreadpool)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories(/usr/local/jdk1.8/include /usr/local/jdk1.8/include/linux)
+include_directories(/usr/local/java/include /usr/local/java/include/linux)
 
 add_definitions(
         -O3 -g -W -Wall
@@ -19,5 +19,5 @@ add_executable(main jni.h jni_md.h tpool.cpp tpool.h
                 threadpool.cpp
         )
 
-target_link_libraries(main /usr/local/jdk1.8/jre/lib/amd64/server/libjvm.so /usr/lib/x86_64-linux-gnu/libpthread.so)
+target_link_libraries(main /usr/local/java/jre/lib/amd64/server/libjvm.so /usr/lib/x86_64-linux-gnu/libpthread.so)
 

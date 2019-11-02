@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/main.dir/threadpool.cpp.o"
   "CMakeFiles/main.dir/tpool.cpp.o"
-  "main"
+  "CMakeFiles/main.dir/threadpool.cpp.o"
   "main.pdb"
+  "main"
 )
 
 # Per-language clean rules from dependency scanning.
