@@ -52,15 +52,3 @@ int main()
     read(sock, buffer, 1024);
     printf("%s\n", buffer);
 }
-
-int i;
-for(i = 0; i < strlen(buffer); i++)
-{
-if(buffer[i] == '$')
-{
-strncpy(psql, buffer, i);
-strncpy(dbn, buffer + i + 1, strlen(buffer) - i - 1);
-}
-}
-printf("%s\n", psql);
-printf("%s\n", dbn);

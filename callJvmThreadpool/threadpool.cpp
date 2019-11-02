@@ -7,8 +7,9 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <string.h>
+#include <cstring>
 #include <iostream>
+#include <vector>
 #include <jni.h>
 #include "tpool.h"
 
@@ -39,23 +40,28 @@ void* handle_stream(void* myJvm, void* arg)
 {
     int server_fd = (int&)arg;
     char buf[1024];
-    char* psql;
-    char* dbn;
+
 
     read(server_fd, buf, 1024);
     printf("%s\n", buf);
 
-    int i;
-    for(i = 0; i < strlen(buf); i++)
+    char* psql;
+    char* dbn;
+    char delims[] = "$";
+    char *res = nullptr;
+    std::vector<char*> resvec;
+
+    res = strtok(buf, delims);
+    while (res != nullptr)
     {
-        if(buf[i] == '$')
-        {
-            strncpy(psql, buf, i);
-            strncpy(dbn, buf + i + 1, strlen(buf) - i - 1);
-        }
+        resvec.push_back(res);
+        res = strtok(nullptr, delims);
     }
 
-    jvmThreads(arg, psql, dbn);
+    psql = resvec[0];
+    dbn = resvec[1];
+
+    jvmThreads(myJvm, psql, dbn);
 
 }
 
