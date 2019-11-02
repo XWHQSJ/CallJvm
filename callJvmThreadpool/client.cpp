@@ -13,15 +13,15 @@
 
 int main()
 {
-    std::string plainsql, dbname;
-    int sock = 0, valread;
+    std::string plainsql, dbname, sendstream;
+    int sock = 0;
     struct sockaddr_in serv_addr;
 
-    plainsql = "select * from test;";
-    char *psql = (char*)plainsql.data();
+    plainsql = "select * from test";
     dbname = "student";
-    char *dbn = (char*)dbname.data();
-    char split = '$';
+    sendstream = plainsql + "$" + dbname;
+    char *sstr = (char*)sendstream.data();
+    printf("sendstream is %s\n", sstr);
     char buffer[1024] = {0};
 
     if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -46,12 +46,21 @@ int main()
         return -1;
     }
 
-    send(sock, psql, strlen(psql), 0);
-    printf("Hello message: %s sent\n", psql);
-    send(sock, reinterpret_cast<const void *>(split), 1, 0);
-    send(sock, dbn, strlen(dbn), 0);
-    printf("Talk message: %s send\n", dbn);
+    send(sock, sstr, strlen(sstr), 0);
+    printf("Hello message: %s sent\n", sstr);
 
-    valread = read(sock, buffer, 1024);
+    read(sock, buffer, 1024);
     printf("%s\n", buffer);
 }
+
+int i;
+for(i = 0; i < strlen(buffer); i++)
+{
+if(buffer[i] == '$')
+{
+strncpy(psql, buffer, i);
+strncpy(dbn, buffer + i + 1, strlen(buffer) - i - 1);
+}
+}
+printf("%s\n", psql);
+printf("%s\n", dbn);
