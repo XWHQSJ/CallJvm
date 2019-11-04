@@ -17,8 +17,8 @@ add_executable(main jni.h jni_md.h tpool.cpp tpool.h
 #                main.cpp
 #                multithread.cpp
                 threadpool.cpp
-                client.cpp
-        server.cpp)
+#                server.cpp
+              )
 
 target_link_libraries(main /usr/local/java/jre/lib/amd64/server/libjvm.so /usr/lib/x86_64-linux-gnu/libpthread.so)
 

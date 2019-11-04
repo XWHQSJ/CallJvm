@@ -118,7 +118,7 @@ void tpool_destroy()
     free(tpool);
 }
 
-int tpool_add_work(void*(*routine)(void*), void* arg, void* arg1)
+int tpool_add_work(void*(*routine)(void*), void* arg)
 {
     tpool_work_t *work, *member;
 
@@ -137,7 +137,6 @@ int tpool_add_work(void*(*routine)(void*), void* arg, void* arg1)
 
     work->routine = routine;
     work->arg = arg;
-    work->arg1 = arg1;
     work->next = nullptr;
 
     pthread_mutex_lock(&tpool->queue_lock);

@@ -30,7 +30,7 @@ int tpool_create(int max_thr_num);
 
 void tpool_destroy();
 
-int tpool_add_work(void*(*routine)(void*), void* arg, void* arg1);
+int tpool_add_work(void*(*routine)(void*), void* arg);
 
 
 #endif //CALLJVMTHREADPOOL_TPOOL_H

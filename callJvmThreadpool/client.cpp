@@ -51,4 +51,7 @@ int main()
 
     read(sock, buffer, 1024);
     printf("%s\n", buffer);
+
+
+    close(sock);
 }
