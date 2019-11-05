@@ -134,7 +134,7 @@ void* handle_stream(void* args)
 
     char hello[] = "Hello send";
     send(client_fd, hello, strlen(hello), 0);
-
+    close(client_fd);
 }
 
 void* jvmThreads(void *myJvm, char* plainsql, char* dbname)
@@ -201,17 +201,28 @@ int main () {
     }
 
 
-    int new_socket;
-    struct ARGS *args;
+    int client_fd, new_socket;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
 
-    new_socket = socket_init();
+    client_fd = socket_init();
 
-    args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
-    args->jvm = &myJvm;
-    args->socket = new_socket;
+    int i = 0;
+    while (1){
+        new_socket = accept(client_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen);
+
+        struct ARGS *args;
+        args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
+        args->jvm = &myJvm;
+        args->socket = new_socket;
+
+        tpool_add_work(handle_stream, args);
+    }
 
 
-    handle_stream(args);
+
+
+//    handle_stream(args);
 
 //    while (1)
 //    {
@@ -232,7 +243,6 @@ int main () {
 
 
     sleep(2);
-    close(new_socket);
     tpool_destroy();
     myJvm.jvm->DestroyJavaVM ();
 
