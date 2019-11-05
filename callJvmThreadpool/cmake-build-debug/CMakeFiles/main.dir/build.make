@@ -70,29 +70,29 @@ CMakeFiles/main.dir/tpool.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/tpool.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/wanhui/Documents/CallJvm/callJvmThreadpool/tpool.cpp -o CMakeFiles/main.dir/tpool.cpp.s
 
-CMakeFiles/main.dir/socketThreadpool.cpp.o: CMakeFiles/main.dir/flags.make
-CMakeFiles/main.dir/socketThreadpool.cpp.o: ../socketThreadpool.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wanhui/Documents/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/socketThreadpool.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/socketThreadpool.cpp.o -c /home/wanhui/Documents/CallJvm/callJvmThreadpool/socketThreadpool.cpp
+CMakeFiles/main.dir/socketMultithread.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/socketMultithread.cpp.o: ../socketMultithread.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wanhui/Documents/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/socketMultithread.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/socketMultithread.cpp.o -c /home/wanhui/Documents/CallJvm/callJvmThreadpool/socketMultithread.cpp
 
-CMakeFiles/main.dir/socketThreadpool.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/socketThreadpool.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/wanhui/Documents/CallJvm/callJvmThreadpool/socketThreadpool.cpp > CMakeFiles/main.dir/socketThreadpool.cpp.i
+CMakeFiles/main.dir/socketMultithread.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/socketMultithread.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/wanhui/Documents/CallJvm/callJvmThreadpool/socketMultithread.cpp > CMakeFiles/main.dir/socketMultithread.cpp.i
 
-CMakeFiles/main.dir/socketThreadpool.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/socketThreadpool.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/wanhui/Documents/CallJvm/callJvmThreadpool/socketThreadpool.cpp -o CMakeFiles/main.dir/socketThreadpool.cpp.s
+CMakeFiles/main.dir/socketMultithread.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/socketMultithread.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/wanhui/Documents/CallJvm/callJvmThreadpool/socketMultithread.cpp -o CMakeFiles/main.dir/socketMultithread.cpp.s
 
 # Object files for target main
 main_OBJECTS = \
 "CMakeFiles/main.dir/tpool.cpp.o" \
-"CMakeFiles/main.dir/socketThreadpool.cpp.o"
+"CMakeFiles/main.dir/socketMultithread.cpp.o"
 
 # External object files for target main
 main_EXTERNAL_OBJECTS =
 
 main: CMakeFiles/main.dir/tpool.cpp.o
-main: CMakeFiles/main.dir/socketThreadpool.cpp.o
+main: CMakeFiles/main.dir/socketMultithread.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: /usr/local/java/jre/lib/amd64/server/libjvm.so
 main: /usr/lib/x86_64-linux-gnu/libpthread.so

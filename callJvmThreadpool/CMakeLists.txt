@@ -15,10 +15,9 @@ add_definitions(
 add_executable(main jni.h jni_md.h tpool.cpp tpool.h
 #                test.cpp
 #                main.cpp
-#                multithread.cpp
-#        socketMultithread.cpp
+        socketMultithread.cpp
 #                server.cpp
-        socketThreadpool.cpp
+#        socketThreadpool.cpp
         )
 
 target_link_libraries(main /usr/local/java/jre/lib/amd64/server/libjvm.so /usr/lib/x86_64-linux-gnu/libpthread.so)
