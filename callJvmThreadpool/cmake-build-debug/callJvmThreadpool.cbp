@@ -102,7 +102,7 @@
 		<Unit filename="/home/wanhui/Documents/CallJvm/callJvmThreadpool/jni_md.h">
 			<Option target="main"/>
 		</Unit>
-		<Unit filename="/home/wanhui/Documents/CallJvm/callJvmThreadpool/socketMultithread.cpp">
+		<Unit filename="/home/wanhui/Documents/CallJvm/callJvmThreadpool/socketThreadpool.cpp">
 			<Option target="main"/>
 		</Unit>
 		<Unit filename="/home/wanhui/Documents/CallJvm/callJvmThreadpool/tpool.cpp">
