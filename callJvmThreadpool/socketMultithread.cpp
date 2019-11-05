@@ -11,8 +11,9 @@
 #include <iostream>
 #include <vector>
 #include <jni.h>
-#include "tpool.h"
+#include <pthread.h>
 
+//#include "tpool.h"
 
 #define NUM_THREADS 6
 
@@ -28,6 +29,11 @@ struct ARGS
     struct JVM* jvm;
     int socket;
 };
+
+
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
+pthread_t threads[NUM_THREADS];
 
 
 void *jvmThreads(void *myJvm, char* plainsql, char* dbname);
@@ -75,12 +81,8 @@ int socket_init()
     }
 
     printf("listening...\n");
-    if ((new_socket = accept(server_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
-        perror("accept failed");
-        exit(EXIT_FAILURE);
-    }
 
-    return new_socket;
+    return server_fd;
 }
 
 JNIEnv *create_vm (struct JVM *jvm) {
@@ -134,7 +136,8 @@ void* handle_stream(void* args)
 
     char hello[] = "Hello send";
     send(client_fd, hello, strlen(hello), 0);
-
+    close(client_fd);
+    pthread_exit(nullptr);
 }
 
 void* jvmThreads(void *myJvm, char* plainsql, char* dbname)
@@ -144,9 +147,11 @@ void* jvmThreads(void *myJvm, char* plainsql, char* dbname)
 
     JNIEnv* env = nullptr;
 
+    pthread_mutex_lock(&lock);
     jvmPtr->AttachCurrentThread((void**)&(env), nullptr);
     invoke_class(env, plainsql, dbname);
     jvmPtr->DetachCurrentThread();
+    pthread_mutex_unlock(&lock);
 
     return nullptr;
 }
@@ -194,35 +199,56 @@ int main () {
         exit(1);
     }
 
-    if(tpool_create(NUM_THREADS) != 0)
-    {
-        printf("tpool_create failed\n");
-        exit(1);
-    }
-
-
-    int new_socket;
-    struct ARGS *args;
-
-    new_socket = socket_init();
-
-    args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
-    args->jvm = &myJvm;
-    args->socket = new_socket;
-
-
-    handle_stream(args);
-
-//    while (1)
+//    if(tpool_create(NUM_THREADS) != 0)
 //    {
-//
-//
-//        tpool_add_work(handle_stream, args);
+//        printf("tpool_create failed\n");
+//        exit(1);
 //    }
 
 
+    int client_fd, new_socket;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
 
-    // only 10 tasks
+    client_fd = socket_init();
+
+    int i = 0;
+    while (1){
+        new_socket = accept(client_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen);
+
+        struct ARGS *args;
+        args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
+        args->jvm = &myJvm;
+        args->socket = new_socket;
+
+        if(pthread_create(&threads[i], nullptr, handle_stream, args) != 0){
+            perror("pthread_create failed");
+            exit(EXIT_FAILURE);
+        }
+        pthread_join(threads[i++], nullptr);
+    }
+
+//    if ((new_socket = accept(client_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
+//        perror("accept failed");
+//        exit(EXIT_FAILURE);
+//    }
+//
+//    struct ARGS *args;
+//    args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
+//    args->jvm = &myJvm;
+//    args->socket = new_socket;
+
+    // single thread
+//    handle_stream(args);
+
+
+//    while (1)
+//    {
+//        tpool_add_work(handle_stream, args);
+//        close(new_socket);
+//    }
+
+
 
 //    int i;
 //    for(i = 0; i < 10; i++)
@@ -232,8 +258,7 @@ int main () {
 
 
     sleep(2);
-    close(new_socket);
-    tpool_destroy();
+//    tpool_destroy();
     myJvm.jvm->DestroyJavaVM ();
 
 

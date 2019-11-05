@@ -25,10 +25,6 @@ vector
 -
 jni.h
 -
-tpool.h
-/home/wanhui/CallJvm/callJvmThreadpool/tpool.h
-
-/home/wanhui/CallJvm/callJvmThreadpool/tpool.h
 pthread.h
 -
 
