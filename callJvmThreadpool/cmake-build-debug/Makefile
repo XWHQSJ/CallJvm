@@ -123,32 +123,32 @@ main/fast:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
-socketMultithread.o: socketMultithread.cpp.o
+socketThreadpool.o: socketThreadpool.cpp.o
 
-.PHONY : socketMultithread.o
+.PHONY : socketThreadpool.o
 
 # target to build an object file
-socketMultithread.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/socketMultithread.cpp.o
-.PHONY : socketMultithread.cpp.o
+socketThreadpool.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/socketThreadpool.cpp.o
+.PHONY : socketThreadpool.cpp.o
 
-socketMultithread.i: socketMultithread.cpp.i
+socketThreadpool.i: socketThreadpool.cpp.i
 
-.PHONY : socketMultithread.i
+.PHONY : socketThreadpool.i
 
 # target to preprocess a source file
-socketMultithread.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/socketMultithread.cpp.i
-.PHONY : socketMultithread.cpp.i
+socketThreadpool.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/socketThreadpool.cpp.i
+.PHONY : socketThreadpool.cpp.i
 
-socketMultithread.s: socketMultithread.cpp.s
+socketThreadpool.s: socketThreadpool.cpp.s
 
-.PHONY : socketMultithread.s
+.PHONY : socketThreadpool.s
 
 # target to generate assembly for a file
-socketMultithread.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/socketMultithread.cpp.s
-.PHONY : socketMultithread.cpp.s
+socketThreadpool.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/socketThreadpool.cpp.s
+.PHONY : socketThreadpool.cpp.s
 
 tpool.o: tpool.cpp.o
 
@@ -186,9 +186,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... main"
 	@echo "... edit_cache"
-	@echo "... socketMultithread.o"
-	@echo "... socketMultithread.i"
-	@echo "... socketMultithread.s"
+	@echo "... socketThreadpool.o"
+	@echo "... socketThreadpool.i"
+	@echo "... socketThreadpool.s"
 	@echo "... tpool.o"
 	@echo "... tpool.i"
 	@echo "... tpool.s"

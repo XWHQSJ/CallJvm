@@ -1,5 +1,5 @@
 //
-// Created by wanhui on 11/5/19.
+// Created by wanhui on 10/12/19.
 //
 
 #include <cstdio>
@@ -11,8 +11,9 @@
 #include <iostream>
 #include <vector>
 #include <jni.h>
-#include "tpool.h"
+#include <pthread.h>
 
+#include "tpool.h"
 
 #define NUM_THREADS 6
 
@@ -75,12 +76,8 @@ int socket_init()
     }
 
     printf("listening...\n");
-    if ((new_socket = accept(server_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
-        perror("accept failed");
-        exit(EXIT_FAILURE);
-    }
 
-    return new_socket;
+    return server_fd;
 }
 
 JNIEnv *create_vm (struct JVM *jvm) {
@@ -135,6 +132,7 @@ void* handle_stream(void* args)
     char hello[] = "Hello send";
     send(client_fd, hello, strlen(hello), 0);
     close(client_fd);
+    pthread_exit(nullptr);
 }
 
 void* jvmThreads(void *myJvm, char* plainsql, char* dbname)
@@ -218,21 +216,28 @@ int main () {
         tpool_add_work(handle_stream, args);
     }
 
+//    if ((new_socket = accept(client_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
+//        perror("accept failed");
+//        exit(EXIT_FAILURE);
+//    }
+//
+//    struct ARGS *args;
+//    args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
+//    args->jvm = &myJvm;
+//    args->socket = new_socket;
 
+//    tpool_add_work(handle_stream, args);
 
-
+    // single thread
 //    handle_stream(args);
 
 //    while (1)
 //    {
-//
-//
 //        tpool_add_work(handle_stream, args);
+//        close(new_socket);
 //    }
 
 
-
-    // only 10 tasks
 
 //    int i;
 //    for(i = 0; i < 10; i++)

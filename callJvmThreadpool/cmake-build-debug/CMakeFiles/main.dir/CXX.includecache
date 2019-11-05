@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/wanhui/Documents/CallJvm/callJvmThreadpool/socketMultithread.cpp
+/home/wanhui/Documents/CallJvm/callJvmThreadpool/socketThreadpool.cpp
 cstdio
 -
 cstdlib
@@ -25,6 +25,12 @@ vector
 -
 jni.h
 -
+pthread.h
+-
+tpool.h
+/home/wanhui/Documents/CallJvm/callJvmThreadpool/tpool.h
+
+/home/wanhui/Documents/CallJvm/callJvmThreadpool/tpool.h
 pthread.h
 -
 

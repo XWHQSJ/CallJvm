@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/wanhui/Documents/CallJvm/callJvmThreadpool/socketMultithread.cpp" "/home/wanhui/Documents/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/socketMultithread.cpp.o"
+  "/home/wanhui/Documents/CallJvm/callJvmThreadpool/socketThreadpool.cpp" "/home/wanhui/Documents/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/socketThreadpool.cpp.o"
   "/home/wanhui/Documents/CallJvm/callJvmThreadpool/tpool.cpp" "/home/wanhui/Documents/CallJvm/callJvmThreadpool/cmake-build-debug/CMakeFiles/main.dir/tpool.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
