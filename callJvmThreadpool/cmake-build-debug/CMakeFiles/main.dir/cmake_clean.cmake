@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/main.dir/tpool.cpp.o"
-  "CMakeFiles/main.dir/threadpool.cpp.o"
+  "CMakeFiles/main.dir/socketMultithread.cpp.o"
   "main.pdb"
   "main"
 )

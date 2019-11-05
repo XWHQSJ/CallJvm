@@ -16,7 +16,7 @@ add_executable(main jni.h jni_md.h tpool.cpp tpool.h
 #                test.cpp
 #                main.cpp
 #                multithread.cpp
-                threadpool.cpp
+        socketMultithread.cpp
 #                server.cpp
               )
 
