@@ -2,9 +2,9 @@
 
 Call JVM from C/C++ in ThreadPool Using JNI
 
-### 文件结构 ——
+### 文件结构
 
-```
+```text
 .
 ├── callJvmThreadpool
 │   ├── a.out
@@ -80,8 +80,8 @@ Call JVM from C/C++ in ThreadPool Using JNI
 │   └── tpool.h
 └── README.md
 ```
-### 文件解释 ——
-
+### 文件解释
+```text
 - CMakeLists.txt : cmake编译文件
 - jni.h : java JNI接口函数
 - jni_md.h : jni.h调用的必要函数
@@ -96,10 +96,11 @@ Call JVM from C/C++ in ThreadPool Using JNI
 - test.cpp : 测试程序
 - tpool.cpp : 线程池实现程序
 - tpool.h : 线程池实现头文件
+```
 
 ### 程序编译
 
-```
+```shell script
 cd callJvmThreadpool
 cmake ..
 ./a.out
