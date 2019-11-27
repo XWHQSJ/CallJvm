@@ -2,13 +2,12 @@
 
 Call JVM from C/C++ in ThreadPool Using JNI
 
-文件结构 ——
+### 文件结构 ——
+
 ```
 .
 ├── callJvmThreadpool
 │   ├── a.out
-│   ├── client
-│   ├── client.cpp
 │   ├── cmake-build-debug
 │   │   ├── callJvm.cbp
 │   │   ├── callJvmThreadp.cbp
@@ -72,6 +71,8 @@ Call JVM from C/C++ in ThreadPool Using JNI
 │   ├── qin_test.jar
 │   ├── server
 │   ├── server.cpp
+│   ├── client
+│   ├── client.cpp
 │   ├── socketMultithread.cpp
 │   ├── socketThreadpool.cpp
 │   ├── test.cpp
@@ -79,3 +80,40 @@ Call JVM from C/C++ in ThreadPool Using JNI
 │   └── tpool.h
 └── README.md
 ```
+### 文件解释 ——
+
+···
+├── CMakeLists.txt : cmake编译文件
+├── jni.h : java JNI接口函数
+├── jni_md.h : jni.h调用的必要函数
+├── main.cpp : 测试主程序
+├── pureMultithread.cpp : 干净的多线程程序
+├── qin_test1.jar : 测试的jar包1
+├── qin_test.jar : 测试的jar包0
+├── server.cpp : socket服务器程序
+├── client.cpp : socket客户端程序
+├── socketMultithread.cpp : socket服务器+jni调用的多线程程序
+├── socketThreadpool.cpp : socket服务器+jni调用的线程池程序
+├── test.cpp : 测试程序
+├── tpool.cpp : 线程池实现程序
+└── tpool.h : 线程池实现头文件
+···
+
+### 程序编译
+
+```
+cd callJvmThreadpool
+cmake ..
+./a.out
+```
+
+### 程序目的
+
+- 最初目的：使用C++代码调用java编写的代码
+- 中间目的：使用多线程方式调用java代码
+- 最终目的：使用线程池方式减少多线程带来的资源消耗调用java代码
+
+### 相关内容
+
+- https://www3.ntu.edu.sg/home/ehchua/programming/java/JavaNativeInterface.html
+- https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/jniTOC.html
