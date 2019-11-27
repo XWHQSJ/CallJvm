@@ -82,22 +82,20 @@ Call JVM from C/C++ in ThreadPool Using JNI
 ```
 ### 文件解释 ——
 
-···
-├── CMakeLists.txt : cmake编译文件
-├── jni.h : java JNI接口函数
-├── jni_md.h : jni.h调用的必要函数
-├── main.cpp : 测试主程序
-├── pureMultithread.cpp : 干净的多线程程序
-├── qin_test1.jar : 测试的jar包1
-├── qin_test.jar : 测试的jar包0
-├── server.cpp : socket服务器程序
-├── client.cpp : socket客户端程序
-├── socketMultithread.cpp : socket服务器+jni调用的多线程程序
-├── socketThreadpool.cpp : socket服务器+jni调用的线程池程序
-├── test.cpp : 测试程序
-├── tpool.cpp : 线程池实现程序
-└── tpool.h : 线程池实现头文件
-···
+- CMakeLists.txt : cmake编译文件
+- jni.h : java JNI接口函数
+- jni_md.h : jni.h调用的必要函数
+- main.cpp : 测试主程序
+- pureMultithread.cpp : 干净的多线程程序
+- qin_test1.jar : 测试的jar包1
+- qin_test.jar : 测试的jar包0
+- server.cpp : socket服务器程序
+- client.cpp : socket客户端程序
+- socketMultithread.cpp : socket服务器+jni调用的多线程程序
+- socketThreadpool.cpp : socket服务器+jni调用的线程池程序
+- test.cpp : 测试程序
+- tpool.cpp : 线程池实现程序
+- tpool.h : 线程池实现头文件
 
 ### 程序编译
 
