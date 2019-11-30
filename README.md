@@ -112,6 +112,10 @@ cmake ..
 - 中间目的：使用多线程方式调用java代码
 - 最终目的：使用线程池方式减少多线程带来的资源消耗调用java代码
 
+### 注意事项
+- C++调用Java JNI是一种不得已而为之的方法，其调用开销很大，并不值得
+- 为了解决JNI调用问题，调整为使用socket方案，使用本地文件映射，开销大大减小
+
 ### 相关内容
 
 - https://www3.ntu.edu.sg/home/ehchua/programming/java/JavaNativeInterface.html
