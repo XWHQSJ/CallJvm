@@ -86,7 +86,7 @@ Call JVM from C/C++ in ThreadPool Using JNI
 - jni.h : java JNI接口函数
 - jni_md.h : jni.h调用的必要函数
 - main.cpp : 测试主程序
-- pureMultithread.cpp : 干净的多线程程序
+- pureMultithread.cpp : 纯净的多线程程序
 - qin_test1.jar : 测试的jar包1
 - qin_test.jar : 测试的jar包0
 - server.cpp : socket服务器程序
@@ -100,6 +100,7 @@ Call JVM from C/C++ in ThreadPool Using JNI
 
 ### 程序编译
 
+可根据CMakeLists.txt文件中的
 ```shell script
 cd callJvmThreadpool
 cmake ..
@@ -108,13 +109,13 @@ cmake ..
 
 ### 程序目的
 
-- 最初目的：使用C++代码调用java编写的代码
-- 中间目的：使用多线程方式调用java代码
-- 最终目的：使用线程池方式减少多线程带来的资源消耗调用java代码
+- 最初目的：使用C++代码通过JNI接口调用Java模块代码（实际上是启动一个JVM，在JVM中运行Java模块代码）
+- 中间目的：使用多线程技术由每次调用JNI生成一个JVM，提升为生成多个JVM线程运行Java模块代码
+- 最终目的：使用线程池技术预先生成多个JVM线程，减少多线程调用Java模块代码带来的资源消耗
 
 ### 注意事项
-- C++调用Java JNI是一种不得已而为之的方法，其调用开销很大，并不值得
-- 为了解决JNI调用问题，调整为使用socket方案，使用本地文件映射，开销大大减小
+- C++通过JNI接口调用Java模块代码是一种不得已而为之的方法，每次调用JNI启动JVM的开销都很大，并不值得
+- 为了解决JVM “一调一用” 问题，后程序框架调整为使用UNIX Domain Socket方案，在本地进行文件数据映射，大大减小开销
 
 ### 相关内容
 
