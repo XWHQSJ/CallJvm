@@ -21,9 +21,13 @@ A socket-based server variant accepts work over TCP so external clients can trig
 - **Length-prefixed framing** (`frame.h/cpp`) -- 4-byte big-endian length prefix for reliable message boundaries
 - **RAII guards** (`jni_guard.h`) -- `JvmGuard` and `JniEnvGuard` for exception-safe JVM/thread lifecycle
 - **JNI exception helper** (`jni_util.h`) -- `jni_check()` called after every JNI operation for reliable error reporting
+- **Real-world Java example** (`SqlEcho.java`) -- parses SQL SELECT statements, returns structured JSON-like results via JNI
 - **Benchmark** (`benchmark.cpp`) -- `std::chrono` timing harness comparing dispatch strategies
 - **Tests** -- GoogleTest suite for thread pool and message parsing
-- **CI** -- GitHub Actions matrix with Temurin JDK 17 + 21
+- **Fuzz testing** (`fuzz/fuzz_frame.cpp`) -- libFuzzer target for the frame parser
+- **CI** -- GitHub Actions: build matrix (JDK 17+21), sanitizers (ASan/UBSan/TSan), fuzzing, CodeQL
+- **Release automation** -- prebuilt binaries for macOS arm64 and Linux x64 on tag push
+- **Security** -- `SECURITY.md` with responsible disclosure policy
 
 ## Project Structure
 
@@ -44,13 +48,26 @@ callJvmThreadpool/
   server.cpp                # Standalone socket server
   client.cpp                # Socket client for testing
   test.cpp                  # Misc test code
-  qin_test.jar              # Test Java classes
-  qin_test1.jar             # Test Java classes (alternate)
+  java/                     # Java examples
+    build.sh                # Build script for Java classes
+    src/com/xwhqsj/example/
+      SqlEcho.java          # SQL-echo demo (parses SELECT, returns structured result)
+  qin_test.jar              # Legacy test Java classes
+  qin_test1.jar             # Legacy test Java classes (alternate)
 tests/
   CMakeLists.txt
   tpool_test.cpp            # GoogleTest tests for tpool + parsing
+fuzz/
+  fuzz_frame.cpp            # libFuzzer target for frame parser
+benchmarks/
+  results.md                # Benchmark measurement template
 .github/workflows/
-  ci.yml                    # CI pipeline
+  ci.yml                    # CI: build, test, sanitizers (ASan/UBSan/TSan), fuzz
+  release.yml               # Release: prebuilt binaries on tag push
+  codeql.yml                # CodeQL static analysis
+.github/
+  dependabot.yml            # Weekly GitHub Actions dependency updates
+SECURITY.md                 # Security policy and responsible disclosure
 ```
 
 ## Requirements
@@ -82,6 +99,26 @@ export CALLJVM_CLASSPATH="./qin_test1.jar:./qin_test.jar"
 ```
 
 If not set, defaults to `"."` (current directory).
+
+## Java Example: SqlEcho
+
+The project includes a real-world Java example that demonstrates non-trivial JNI integration. `SqlEcho` accepts a SQL-like SELECT statement and a database name, parses the query using regex, and returns a structured JSON-like result.
+
+```bash
+# Build the Java example
+cd callJvmThreadpool/java && ./build.sh && cd ../..
+
+# Set classpath to the built JAR
+export CALLJVM_CLASSPATH=callJvmThreadpool/java/sqlecho.jar
+
+# Test standalone
+java -cp callJvmThreadpool/java/sqlecho.jar com.xwhqsj.example.SqlEcho
+
+# Run via JNI
+./build/jni_test
+```
+
+The C++ code auto-detects `SqlEcho` on the classpath and falls back to the legacy `Helloworld` stub if not found.
 
 ## Run
 

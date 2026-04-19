@@ -70,28 +70,50 @@ static JNIEnv* create_vm(JVM* jvm) {
 }
 
 static void invoke_class(JNIEnv* env, const char* plainsql, const char* dbname) {
-    jclass Main_class = env->FindClass("com/testjvm/Helloworld");
-    if (!jni_check(env, "FindClass") || Main_class == nullptr)
+    // Try SqlEcho first (new example), fall back to Helloworld (legacy stub)
+    jclass cls = env->FindClass("com/xwhqsj/example/SqlEcho");
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        // Fall back to legacy Helloworld class
+        cls = env->FindClass("com/testjvm/Helloworld");
+        if (!jni_check(env, "FindClass(Helloworld)") || cls == nullptr)
+            return;
+
+        jmethodID init_id = env->GetMethodID(cls, "<init>", "()V");
+        if (!jni_check(env, "GetMethodID(<init>)") || init_id == nullptr)
+            return;
+        jobject obj = env->NewObject(cls, init_id);
+        if (!jni_check(env, "NewObject"))
+            return;
+        jstring dbnamestr = env->NewStringUTF(dbname);
+        jmethodID stu_id = env->GetMethodID(cls, "student", "([Ljava/lang/String;)V");
+        if (!jni_check(env, "GetMethodID(student)") || stu_id == nullptr)
+            return;
+        env->CallObjectMethod(obj, stu_id, dbnamestr);
+        jni_check(env, "CallObjectMethod(student)");
+        (void)plainsql;
+        return;
+    }
+
+    // SqlEcho.process(sql, dbName) -> String
+    jmethodID process_id = env->GetStaticMethodID(
+        cls, "process",
+        "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+    if (!jni_check(env, "GetStaticMethodID(process)") || process_id == nullptr)
         return;
 
-    jmethodID init_id = env->GetMethodID(Main_class, "<init>", "()V");
-    if (!jni_check(env, "GetMethodID(<init>)") || init_id == nullptr)
+    jstring jsql = env->NewStringUTF(plainsql);
+    jstring jdb = env->NewStringUTF(dbname);
+
+    auto jresult = (jstring)env->CallStaticObjectMethod(cls, process_id, jsql, jdb);
+    if (!jni_check(env, "CallStaticObjectMethod(process)"))
         return;
 
-    jobject obj = env->NewObject(Main_class, init_id);
-    if (!jni_check(env, "NewObject"))
-        return;
-
-    jstring dbnamestr = env->NewStringUTF(dbname);
-
-    jmethodID stu_id = env->GetMethodID(Main_class, "student", "([Ljava/lang/String;)V");
-    if (!jni_check(env, "GetMethodID(student)") || stu_id == nullptr)
-        return;
-
-    env->CallObjectMethod(obj, stu_id, dbnamestr);
-    jni_check(env, "CallObjectMethod(student)");
-
-    (void)plainsql;
+    if (jresult) {
+        const char* result = env->GetStringUTFChars(jresult, nullptr);
+        printf("SqlEcho result:\n%s\n", result);
+        env->ReleaseStringUTFChars(jresult, result);
+    }
 }
 
 static void handle_client(JVM* myJvm, int client_fd) {
