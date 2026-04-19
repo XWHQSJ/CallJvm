@@ -1,0 +1,45 @@
+# CMake
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+Makefile2
+*.cbp
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# Compiled objects
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+
+# Executables
+a.out
+*.exe
+server
+client
+main
+
+# IDE
+.idea/
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# JVM crash logs
+hs_err_pid*.log
+replay_pid*.log
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini

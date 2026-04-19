@@ -1,123 +1,90 @@
 # CallJvm
 
-Call JVM from C/C++ in ThreadPool Using JNI
+**Call JVM from C/C++ in a Thread Pool via JNI**
 
-### 文件结构
+![C++17](https://img.shields.io/badge/C%2B%2B-17-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green)
 
-```text
-.
-├── callJvmThreadpool
-│   ├── a.out
-│   ├── cmake-build-debug
-│   │   ├── callJvm.cbp
-│   │   ├── callJvmThreadp.cbp
-│   │   ├── callJvmThreadpool.cbp
-│   │   ├── CMakeCache.txt
-│   │   ├── CMakeFiles
-│   │   │   ├── 3.14.5
-│   │   │   │   ├── CMakeCCompiler.cmake
-│   │   │   │   ├── CMakeCXXCompiler.cmake
-│   │   │   │   ├── CMakeDetermineCompilerABI_C.bin
-│   │   │   │   ├── CMakeDetermineCompilerABI_CXX.bin
-│   │   │   │   ├── CMakeSystem.cmake
-│   │   │   │   ├── CompilerIdC
-│   │   │   │   │   ├── a.out
-│   │   │   │   │   ├── CMakeCCompilerId.c
-│   │   │   │   │   └── tmp
-│   │   │   │   └── CompilerIdCXX
-│   │   │   │       ├── a.out
-│   │   │   │       ├── CMakeCXXCompilerId.cpp
-│   │   │   │       └── tmp
-│   │   │   ├── clion-environment.txt
-│   │   │   ├── clion-log.txt
-│   │   │   ├── cmake.check_cache
-│   │   │   ├── CMakeDirectoryInformation.cmake
-│   │   │   ├── CMakeOutput.log
-│   │   │   ├── CMakeTmp
-│   │   │   ├── feature_tests.bin
-│   │   │   ├── feature_tests.c
-│   │   │   ├── feature_tests.cxx
-│   │   │   ├── main.dir
-│   │   │   │   ├── build.make
-│   │   │   │   ├── cmake_clean.cmake
-│   │   │   │   ├── CXX.includecache
-│   │   │   │   ├── DependInfo.cmake
-│   │   │   │   ├── depend.internal
-│   │   │   │   ├── depend.make
-│   │   │   │   ├── flags.make
-│   │   │   │   ├── link.txt
-│   │   │   │   ├── progress.make
-│   │   │   │   ├── socketMultithread.cpp.o
-│   │   │   │   ├── socketThreadpool.cpp.o
-│   │   │   │   └── tpool.cpp.o
-│   │   │   ├── Makefile2
-│   │   │   ├── Makefile.cmake
-│   │   │   ├── progress.marks
-│   │   │   └── TargetDirectories.txt
-│   │   ├── cmake_install.cmake
-│   │   ├── hs_err_pid22583.log
-│   │   ├── hs_err_pid22734.log
-│   │   ├── hs_err_pid22793.log
-│   │   ├── hs_err_pid22856.log
-│   │   ├── hs_err_pid22911.log
-│   │   ├── main
-│   │   └── Makefile
-│   ├── CMakeLists.txt
-│   ├── jni.h
-│   ├── jni_md.h
-│   ├── main.cpp
-│   ├── pureMultithread.cpp
-│   ├── qin_test1.jar
-│   ├── qin_test.jar
-│   ├── server
-│   ├── server.cpp
-│   ├── client
-│   ├── client.cpp
-│   ├── socketMultithread.cpp
-│   ├── socketThreadpool.cpp
-│   ├── test.cpp
-│   ├── tpool.cpp
-│   └── tpool.h
-└── README.md
+## Overview
+
+CallJvm demonstrates how to invoke Java code from C++ through the Java Native Interface (JNI). A naive JNI call creates and destroys a JVM per invocation, which is expensive. This project explores progressively better strategies: single JVM, multithreaded JVM sharing, and finally a POSIX thread pool that keeps worker threads attached to a long-lived JVM, amortizing the startup cost across many requests.
+
+A socket-based server variant accepts work over TCP so external clients can trigger JVM calls without embedding JNI in their own processes.
+
+## Features
+
+- **Thread pool** (`tpool.c/h`) -- lightweight C-style POSIX thread pool with work queue
+- **Multithreaded JVM invocation** -- `AttachCurrentThread` / `DetachCurrentThread` for safe concurrent access
+- **Socket server** -- TCP listener that dispatches incoming requests to the thread pool
+- **Pure multithread baseline** -- standalone multithreaded JVM example for comparison
+- **Unix Domain Socket note** -- the project README records a later realization that UDS-based IPC is more practical than JNI for production use
+
+## Project Structure
+
 ```
-### 文件解释
-```text
-- CMakeLists.txt : cmake编译文件
-- jni.h : java JNI接口函数
-- jni_md.h : jni.h调用的必要函数
-- main.cpp : 测试主程序
-- pureMultithread.cpp : 纯净的多线程程序
-- qin_test1.jar : 测试的jar包1
-- qin_test.jar : 测试的jar包0
-- server.cpp : socket服务器程序
-- client.cpp : socket客户端程序
-- socketMultithread.cpp : socket服务器+jni调用的多线程程序
-- socketThreadpool.cpp : socket服务器+jni调用的线程池程序
-- test.cpp : 测试程序
-- tpool.cpp : 线程池实现程序
-- tpool.h : 线程池实现头文件
+callJvmThreadpool/
+  CMakeLists.txt            # CMake build definition
+  tpool.h / tpool.cpp       # Thread pool implementation
+  socketThreadpool.cpp      # Socket server + thread pool + JNI (main target)
+  socketMultithread.cpp     # Socket server + raw pthreads + JNI
+  pureMultithread.cpp       # Standalone multithreaded JNI example
+  main.cpp                  # Minimal single-thread JNI test
+  server.cpp                # Standalone socket server
+  client.cpp                # Socket client for testing
+  test.cpp                  # Misc test code
+  jni.h / jni_md.h          # Vendored JNI headers (Linux)
+  qin_test.jar              # Test Java classes
+  qin_test1.jar             # Test Java classes (alternate)
 ```
 
-### 程序编译
+## Requirements
 
-可根据CMakeLists.txt文件中的
-```shell script
-cd callJvmThreadpool
-cmake ..
-./a.out
+- C++17 compiler (GCC, Clang, or MSVC)
+- CMake 3.15+
+- JDK with `JAVA_HOME` set (JNI headers and `libjvm` must be findable by CMake)
+- Linux or macOS (POSIX sockets, pthreads)
+
+## Build
+
+Out-of-source build:
+
+```bash
+cmake -S callJvmThreadpool -B build
+cmake --build build
 ```
 
-### 程序目的
+CMake will locate JNI via `find_package(JNI REQUIRED)`, so make sure `JAVA_HOME` points to your JDK installation.
 
-- 最初目的：使用C++代码通过JNI接口调用Java模块代码（实际上是启动一个JVM，在JVM中运行Java模块代码）
-- 中间目的：使用多线程技术由每次调用JNI生成一个JVM，提升为生成多个JVM线程运行Java模块代码
-- 最终目的：使用线程池技术预先生成多个JVM线程，减少多线程调用Java模块代码带来的资源消耗
+## Run
 
-### 注意事项
-- C++通过JNI接口调用Java模块代码是一种不得已而为之的方法，每次调用JNI启动JVM的开销都很大，并不值得
-- 为了解决JVM “一调一用” 问题，后程序框架调整为使用UNIX Domain Socket方案，在本地进行文件数据映射，大大减小开销
+Depending on which target was compiled (see `CMakeLists.txt` for the active `add_executable`):
 
-### 相关内容
+```bash
+# Thread-pool socket server (default target)
+./build/main
 
-- https://www3.ntu.edu.sg/home/ehchua/programming/java/JavaNativeInterface.html
-- https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/jniTOC.html
+# In another terminal, send a request
+./build/client
+```
+
+The server listens on port 8080. The client sends a `$`-delimited payload (plain SQL + DB name) and receives a response.
+
+For the standalone single-thread test (`main.cpp`), adjust the classpath in the source to point to your jar location, rebuild, and run directly.
+
+## Design Notes
+
+The project evolved through several stages:
+
+1. **Single JVM** (`main.cpp`) -- create a JVM, call a Java method, destroy the JVM. Simple but slow per call.
+2. **Multithread** (`pureMultithread.cpp`, `socketMultithread.cpp`) -- share one JVM across threads using `AttachCurrentThread`. Reduces JVM creation overhead.
+3. **Thread pool** (`socketThreadpool.cpp` + `tpool.*`) -- pre-spawn worker threads, reuse them for incoming socket connections. Avoids per-request thread creation.
+4. **UDS realization** -- invoking JNI still carries significant overhead per call. For production, the author notes that Unix Domain Sockets with file-backed data mapping is a more practical IPC strategy than embedding JNI directly.
+
+## References
+
+- [Java Native Interface -- NTU Tutorial](https://www3.ntu.edu.sg/home/ehchua/programming/java/JavaNativeInterface.html)
+- [JNI Specification -- Oracle](https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/jniTOC.html)
+
+## License
+
+[MIT](LICENSE)

@@ -209,7 +209,7 @@ int main () {
         new_socket = accept(client_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen);
 
         struct ARGS *args;
-        args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
+        args = static_cast<ARGS *>(malloc(sizeof(struct ARGS)));
         args->jvm = &myJvm;
         args->socket = new_socket;
 
@@ -222,7 +222,7 @@ int main () {
 //    }
 //
 //    struct ARGS *args;
-//    args = static_cast<ARGS *>(malloc(sizeof(struct args *)));
+//    args = static_cast<ARGS *>(malloc(sizeof(struct ARGS)));
 //    args->jvm = &myJvm;
 //    args->socket = new_socket;
 
