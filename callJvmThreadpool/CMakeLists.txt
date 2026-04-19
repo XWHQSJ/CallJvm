@@ -49,6 +49,10 @@ add_executable(client client.cpp)
 add_executable(benchmark ${TPOOL_SOURCES} benchmark.cpp)
 target_link_libraries(benchmark PRIVATE Threads::Threads)
 
+# Unix Domain Socket variant with framed protocol + modern C++ threadpool
+add_executable(uds_threadpool frame.cpp udsThreadpool.cpp)
+target_link_libraries(uds_threadpool PRIVATE ${JNI_LIBRARIES} Threads::Threads)
+
 # --- Tests (optional, requires GoogleTest) ---
 option(CALLJVM_BUILD_TESTS "Build tests" ON)
 if(CALLJVM_BUILD_TESTS)
