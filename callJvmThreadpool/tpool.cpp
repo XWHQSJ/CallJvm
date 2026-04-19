@@ -89,13 +89,13 @@ void tpool_destroy()
     int i;
     tpool_work_t *member;
 
+    pthread_mutex_lock(&tpool->queue_lock);
     if(tpool->shutdown)
     {
+        pthread_mutex_unlock(&tpool->queue_lock);
         return;
     }
     tpool->shutdown = 1;
-
-    pthread_mutex_lock(&tpool->queue_lock);
     pthread_cond_broadcast(&tpool->queue_ready);
     pthread_mutex_unlock(&tpool->queue_lock);
 
