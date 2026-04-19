@@ -7,9 +7,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <cstring>
-#include <iostream>
 #include <vector>
-#include <jni.h>
+#include <pthread.h>
+#include "jni.h"
 
 
 #define PORT 8080
@@ -71,6 +71,7 @@ void* handle_stream(void* args)
 
     send(client_fd, hello, strlen(hello), 0);
     printf("Hello message send");
+    return nullptr;
 }
 
 void *jvmThreads(void *myJvm, char *plainsql, char *dbname) {
@@ -94,9 +95,9 @@ JNIEnv *create_vm(struct JVM *jvm) {
     JavaVMInitArgs vm_args;
     JavaVMOption options[3];
 
-    options[0].optionString = "-Djava.compiler=NONE";
-    options[1].optionString = "-Djava.class.path=.:/home/wanhui/CallJvm/callJvmThreadpool/qin_test1.jar";
-    options[2].optionString = "-verbose:jni";
+    options[0].optionString = const_cast<char *>("-Djava.compiler=NONE");
+    options[1].optionString = const_cast<char *>("-Djava.class.path=.:/home/wanhui/CallJvm/callJvmThreadpool/qin_test1.jar");
+    options[2].optionString = const_cast<char *>("-verbose:jni");
 
     vm_args.options = options;
     vm_args.nOptions = 3;
@@ -182,12 +183,12 @@ int main() {
     int new_socket = socket_init();
 
     struct ARGS *args;
-    args = static_cast<ARGS *>(malloc(sizeof(struct ARGS *)));
+    args = static_cast<ARGS *>(malloc(sizeof(struct ARGS)));
     args->jvm = &myJvm;
     args->socket = new_socket;
 
     pthread_mutex_init(&mutexjvm, nullptr);
-    for (unsigned long &thread : threads) {
+    for (pthread_t &thread : threads) {
         printf("before call");
         pthread_create(&thread, nullptr, handle_stream, (void *) &args);
         pthread_join(thread, nullptr);

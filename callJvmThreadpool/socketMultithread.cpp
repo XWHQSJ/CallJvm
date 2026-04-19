@@ -8,9 +8,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <cstring>
-#include <iostream>
 #include <vector>
-#include <jni.h>
+#include "jni.h"
 #include <pthread.h>
 
 //#include "tpool.h"
@@ -90,9 +89,9 @@ JNIEnv *create_vm (struct JVM *jvm) {
     JavaVMInitArgs vm_args;
     JavaVMOption options[3];
 
-    options[0].optionString = "-Djava.compiler=NONE";
-    options[1].optionString = "-Djava.class.path=.:/home/wanhui/CallJvm/callJvmThreadpool/qin_test1.jar";
-    options[2].optionString = "-verbose:jni";
+    options[0].optionString = const_cast<char *>("-Djava.compiler=NONE");
+    options[1].optionString = const_cast<char *>("-Djava.class.path=.:/home/wanhui/CallJvm/callJvmThreadpool/qin_test1.jar");
+    options[2].optionString = const_cast<char *>("-verbose:jni");
 
     vm_args.options = options;
     vm_args.nOptions = 3;

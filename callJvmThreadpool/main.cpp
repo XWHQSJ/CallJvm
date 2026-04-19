@@ -14,9 +14,9 @@ int main()
     jmethodID mid;
     jint square;
     jobject jobj;
-    options[0].optionString = "-Djava.compiler=NONE";
-    options[1].optionString = "-Djava.class.path=.:/home/wanhui/Documents/callJvmThreadpool/qin_test.jar";
-    options[2].optionString = "-verbose:jni"; //用于跟踪运行时的信息
+    options[0].optionString = const_cast<char *>("-Djava.compiler=NONE");
+    options[1].optionString = const_cast<char *>("-Djava.class.path=.:/home/wanhui/Documents/callJvmThreadpool/qin_test.jar");
+    options[2].optionString = const_cast<char *>("-verbose:jni"); //用于跟踪运行时的信息
     vm_args.version = JNI_VERSION_1_8; // JDK版本号
     vm_args.nOptions = 3;
     vm_args.options = options;
