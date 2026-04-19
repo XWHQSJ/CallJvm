@@ -9,22 +9,32 @@
 #include <netinet/in.h>
 #include <cstring>
 #include <vector>
-#include "jni.h"
+#include <jni.h>
 #include <pthread.h>
-
+#include <csignal>
+#include <atomic>
+#include "jni_util.h"
 #include "tpool.h"
 
 #define NUM_THREADS 6
-
 #define PORT 8080
 
+static std::atomic<bool> g_running{true};
+
+static void signal_handler(int) {
+    g_running.store(false);
+}
+
+static const char* get_classpath() {
+    const char* cp = getenv("CALLJVM_CLASSPATH");
+    return cp ? cp : ".";
+}
 
 struct JVM {
     JavaVM *jvm;
 };
 
-struct ARGS
-{
+struct ARGS {
     struct JVM* jvm;
     int socket;
 };
@@ -44,11 +54,10 @@ void* handle_stream(void* arg);
 
 int socket_init()
 {
-    int server_fd, new_socket;
+    int server_fd;
     struct sockaddr_in address;
 
     int opt = 1;
-    int addrlen = sizeof(address);
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
@@ -79,13 +88,15 @@ int socket_init()
     return server_fd;
 }
 
-JNIEnv *create_vm (struct JVM *jvm) {
+JNIEnv *create_vm(struct JVM *jvm) {
     JNIEnv *env;
     JavaVMInitArgs vm_args;
     JavaVMOption options[3];
 
+    std::string cp_opt = std::string("-Djava.class.path=") + get_classpath();
+
     options[0].optionString = const_cast<char *>("-Djava.compiler=NONE");
-    options[1].optionString = const_cast<char *>("-Djava.class.path=.:/home/wanhui/CallJvm/callJvmThreadpool/qin_test1.jar");
+    options[1].optionString = const_cast<char *>(cp_opt.c_str());
     options[2].optionString = const_cast<char *>("-verbose:jni");
 
     vm_args.options = options;
@@ -93,9 +104,9 @@ JNIEnv *create_vm (struct JVM *jvm) {
     vm_args.ignoreUnrecognized = JNI_TRUE;
     vm_args.version = JNI_VERSION_1_8;
 
-    int status = JNI_CreateJavaVM (&jvm->jvm, (void **) &env, &vm_args);
+    int status = JNI_CreateJavaVM(&jvm->jvm, (void **) &env, &vm_args);
     if (status < 0 || !env) {
-        printf ("Error: %d\n", status);
+        printf("Error: %d\n", status);
         return nullptr;
     }
     return env;
@@ -123,6 +134,13 @@ void* handle_stream(void* args)
         res = strtok(nullptr, delims);
     }
 
+    if (resvec.size() < 2) {
+        fprintf(stderr, "Invalid message: expected '$' delimiter\n");
+        close(client_fd);
+        free(arg);
+        return nullptr;
+    }
+
     psql = resvec[0];
     dbn = resvec[1];
 
@@ -131,7 +149,8 @@ void* handle_stream(void* args)
     char hello[] = "Hello send";
     send(client_fd, hello, strlen(hello), 0);
     close(client_fd);
-    pthread_exit(nullptr);
+    free(arg);
+    return nullptr;
 }
 
 void* jvmThreads(void *myJvm, char* plainsql, char* dbname)
@@ -148,55 +167,50 @@ void* jvmThreads(void *myJvm, char* plainsql, char* dbname)
     return nullptr;
 }
 
-void invoke_class (JNIEnv * env, char* plainsql, char* dbname) {
+void invoke_class(JNIEnv *env, char* plainsql, char* dbname) {
     jclass Main_class;
-    jmethodID fun_id;
-    jmethodID static_id;
     jmethodID stu_id;
     jmethodID hello_id;
     jobject obj1;
 
-    Main_class = env->FindClass ("com/testjvm/Helloworld");
-
-    if(Main_class == nullptr)
+    Main_class = env->FindClass("com/testjvm/Helloworld");
+    if (!jni_check(env, "FindClass") || Main_class == nullptr)
         return;
 
-    // test static function main()
-//    fun_id = env->GetStaticMethodID (Main_class, "main", "([Ljava/lang/String;)V");
-//    jstring str = env->NewStringUTF("XWH");
-//    env->CallStaticVoidMethod(Main_class, fun_id, str);
-
-    // test static function name()
-//    static_id = env->GetStaticMethodID(Main_class, "name", "([Ljava/lang/String;)V");
-//    jstring str = env->NewStringUTF("XWH");
-//    env->CallStaticVoidMethod(Main_class, static_id, str);
-
-    // test generally function student()
     hello_id = env->GetMethodID(Main_class, "<init>", "()V");
+    if (!jni_check(env, "GetMethodID(<init>)") || hello_id == nullptr)
+        return;
     obj1 = env->NewObject(Main_class, hello_id);
+    if (!jni_check(env, "NewObject"))
+        return;
     jstring plainsqlstr = env->NewStringUTF(plainsql);
     jstring dbnamestr = env->NewStringUTF(dbname);
 
     stu_id = env->GetMethodID(Main_class, "student", "([Ljava/lang/String;)V");
+    if (!jni_check(env, "GetMethodID(student)") || stu_id == nullptr)
+        return;
     env->CallObjectMethod(obj1, stu_id, dbnamestr);
+    jni_check(env, "CallObjectMethod(student)");
+
+    (void)plainsqlstr;
 }
 
-int main () {
-    struct JVM myJvm{};
-    JNIEnv *myEnv = create_vm (&myJvm);
+int main() {
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
 
-    if (myEnv == nullptr)
-    {
+    struct JVM myJvm{};
+    JNIEnv *myEnv = create_vm(&myJvm);
+
+    if (myEnv == nullptr) {
         printf("create_vm failed\n");
         exit(1);
     }
 
-    if(tpool_create(NUM_THREADS) != 0)
-    {
+    if (tpool_create(NUM_THREADS) != 0) {
         printf("tpool_create failed\n");
         exit(1);
     }
-
 
     int client_fd, new_socket;
     struct sockaddr_in address;
@@ -204,8 +218,14 @@ int main () {
 
     client_fd = socket_init();
 
-    while (1){
+    while (g_running.load()) {
         new_socket = accept(client_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen);
+        if (new_socket < 0) {
+            if (!g_running.load())
+                break;
+            perror("accept failed");
+            continue;
+        }
 
         struct ARGS *args;
         args = static_cast<ARGS *>(malloc(sizeof(struct ARGS)));
@@ -215,40 +235,10 @@ int main () {
         tpool_add_work(handle_stream, args);
     }
 
-//    if ((new_socket = accept(client_fd, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
-//        perror("accept failed");
-//        exit(EXIT_FAILURE);
-//    }
-//
-//    struct ARGS *args;
-//    args = static_cast<ARGS *>(malloc(sizeof(struct ARGS)));
-//    args->jvm = &myJvm;
-//    args->socket = new_socket;
-
-//    tpool_add_work(handle_stream, args);
-
-    // single thread
-//    handle_stream(args);
-
-//    while (1)
-//    {
-//        tpool_add_work(handle_stream, args);
-//        close(new_socket);
-//    }
-
-
-
-//    int i;
-//    for(i = 0; i < 10; i++)
-//    {
-//        tpool_add_work(handle_stream, args);
-//    }
-
-
-    sleep(2);
+    printf("Shutting down...\n");
+    close(client_fd);
     tpool_destroy();
-    myJvm.jvm->DestroyJavaVM ();
-
+    myJvm.jvm->DestroyJavaVM();
 
     return 0;
 }

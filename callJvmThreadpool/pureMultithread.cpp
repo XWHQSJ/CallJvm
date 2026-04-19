@@ -9,11 +9,16 @@
 #include <cstring>
 #include <vector>
 #include <pthread.h>
-#include "jni.h"
-
+#include <jni.h>
+#include "jni_util.h"
 
 #define PORT 8080
 #define NUM_THREADS 6
+
+static const char* get_classpath() {
+    const char* cp = getenv("CALLJVM_CLASSPATH");
+    return cp ? cp : ".";
+}
 
 pthread_mutex_t mutexjvm;
 
@@ -64,10 +69,15 @@ void* handle_stream(void* args)
         res = strtok(nullptr, delims);
     }
 
+    if (resvec.size() < 2) {
+        fprintf(stderr, "Invalid message: expected '$' delimiter\n");
+        return nullptr;
+    }
+
     psql = resvec[0];
     dbn = resvec[1];
 
-    jvmThreads(&myJvm, psql, dbn);
+    jvmThreads(myJvm, psql, dbn);
 
     send(client_fd, hello, strlen(hello), 0);
     printf("Hello message send");
@@ -95,13 +105,14 @@ JNIEnv *create_vm(struct JVM *jvm) {
     JavaVMInitArgs vm_args;
     JavaVMOption options[3];
 
+    std::string cp_opt = std::string("-Djava.class.path=") + get_classpath();
+
     options[0].optionString = const_cast<char *>("-Djava.compiler=NONE");
-    options[1].optionString = const_cast<char *>("-Djava.class.path=.:/home/wanhui/CallJvm/callJvmThreadpool/qin_test1.jar");
+    options[1].optionString = const_cast<char *>(cp_opt.c_str());
     options[2].optionString = const_cast<char *>("-verbose:jni");
 
     vm_args.options = options;
     vm_args.nOptions = 3;
-    vm_args.ignoreUnrecognized = 0;
     vm_args.ignoreUnrecognized = JNI_TRUE;
     vm_args.version = JNI_VERSION_1_8;
 
@@ -121,15 +132,25 @@ void invoke_class(JNIEnv *env, char *plainsql, char *dbname) {
     jobject obj1;
 
     Main_class = env->FindClass("com/testjvm/Helloworld");
+    if (!jni_check(env, "FindClass") || Main_class == nullptr)
+        return;
 
-    // test generally function student()
     hello_id = env->GetMethodID(Main_class, "<init>", "()V");
+    if (!jni_check(env, "GetMethodID(<init>)") || hello_id == nullptr)
+        return;
     obj1 = env->NewObject(Main_class, hello_id);
+    if (!jni_check(env, "NewObject"))
+        return;
     jstring plainsqlstr = env->NewStringUTF(plainsql);
     jstring dbnamestr = env->NewStringUTF(dbname);
 
     stu_id = env->GetMethodID(Main_class, "student", "([Ljava/lang/String;)V");
+    if (!jni_check(env, "GetMethodID(student)") || stu_id == nullptr)
+        return;
     env->CallObjectMethod(obj1, stu_id, dbnamestr);
+    jni_check(env, "CallObjectMethod(student)");
+
+    (void)plainsqlstr;
 }
 
 int socket_init() {
@@ -190,7 +211,9 @@ int main() {
     pthread_mutex_init(&mutexjvm, nullptr);
     for (pthread_t &thread : threads) {
         printf("before call");
-        pthread_create(&thread, nullptr, handle_stream, (void *) &args);
+        pthread_create(&thread, nullptr, handle_stream, (void *) args);
+    }
+    for (pthread_t &thread : threads) {
         pthread_join(thread, nullptr);
     }
 

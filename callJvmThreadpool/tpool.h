@@ -12,7 +12,6 @@ typedef struct tpool_work
 {
     void* (*routine)(void*);
     void *arg;
-    void *arg1;
     struct tpool_work *next;
 } tpool_work_t;
 

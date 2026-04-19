@@ -1,7 +1,13 @@
 #include <iostream>
-#include "jni.h"
+#include <cstdlib>
+#include <cstring>
+#include <jni.h>
+#include "jni_util.h"
 
-using namespace std;
+static const char* get_classpath() {
+    const char* cp = getenv("CALLJVM_CLASSPATH");
+    return cp ? cp : ".";
+}
 
 int main()
 {
@@ -12,51 +18,63 @@ int main()
     long status;
     jclass cls;
     jmethodID mid;
-    jint square;
     jobject jobj;
+
+    std::string cp_opt = std::string("-Djava.class.path=") + get_classpath();
+
     options[0].optionString = const_cast<char *>("-Djava.compiler=NONE");
-    options[1].optionString = const_cast<char *>("-Djava.class.path=.:/home/wanhui/Documents/callJvmThreadpool/qin_test.jar");
-    options[2].optionString = const_cast<char *>("-verbose:jni"); //用于跟踪运行时的信息
-    vm_args.version = JNI_VERSION_1_8; // JDK版本号
+    options[1].optionString = const_cast<char *>(cp_opt.c_str());
+    options[2].optionString = const_cast<char *>("-verbose:jni");
+    vm_args.version = JNI_VERSION_1_8;
     vm_args.nOptions = 3;
     vm_args.options = options;
     vm_args.ignoreUnrecognized = JNI_TRUE;
     status = JNI_CreateJavaVM(&jvm, (void**)&env, &vm_args);
 
-    if(status != JNI_ERR){
+    if (status != JNI_ERR) {
         printf("create java jvm success\n");
-        printf("%d\n", env);
-        cls = env->FindClass("com/testjvm/Helloworld");  // 在这里查Java类
-        printf("%d\n", cls);
-        if(cls !=0){
+        printf("%p\n", (void*)env);
+        cls = env->FindClass("com/testjvm/Helloworld");
+        if (!jni_check(env, "FindClass")) {
+            jvm->DestroyJavaVM();
+            return -1;
+        }
+        printf("%p\n", (void*)cls);
+        if (cls != nullptr) {
             printf("find java class success\n");
-            // 构造函数
-            mid = env->GetMethodID(cls,"<init>","()V");
-            if(mid !=0){
-                jobj=env->NewObject(cls,mid);
+
+            mid = env->GetMethodID(cls, "<init>", "()V");
+            if (!jni_check(env, "GetMethodID(<init>)")) {
+                jvm->DestroyJavaVM();
+                return -1;
+            }
+            if (mid != nullptr) {
+                jobj = env->NewObject(cls, mid);
+                if (!jni_check(env, "NewObject")) {
+                    jvm->DestroyJavaVM();
+                    return -1;
+                }
                 std::cout << "init ok" << std::endl;
             }
 
-            // 调用main函数
-            mid = env->GetStaticMethodID( cls, "main", "([Ljava/lang/String;)V");
-            if(mid !=0){
-                square = env->CallStaticIntMethod( cls, mid);
-                std::cout << square << std::endl;
+            mid = env->GetStaticMethodID(cls, "main", "([Ljava/lang/String;)V");
+            if (!jni_check(env, "GetStaticMethodID(main)")) {
+                jvm->DestroyJavaVM();
+                return -1;
             }
-
-        }
-        else{
+            if (mid != nullptr) {
+                env->CallStaticVoidMethod(cls, mid, nullptr);
+                jni_check(env, "CallStaticVoidMethod(main)");
+            }
+        } else {
             fprintf(stderr, "FindClass failed\n");
         }
 
         jvm->DestroyJavaVM();
-        fprintf(stdout, "Java VM destory.\n");
+        fprintf(stdout, "Java VM destroy.\n");
         return 0;
-    }
-    else{
+    } else {
         printf("create java jvm fail\n");
         return -1;
     }
 }
-
-
