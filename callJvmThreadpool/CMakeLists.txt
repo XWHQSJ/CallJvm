@@ -5,7 +5,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Locate JNI (requires JAVA_HOME to be set)
+# Auto-detect JAVA_HOME on macOS via /usr/libexec/java_home
+if(APPLE AND NOT DEFINED ENV{JAVA_HOME})
+    execute_process(
+        COMMAND /usr/libexec/java_home
+        OUTPUT_VARIABLE JAVA_HOME_AUTO
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE JAVA_HOME_RESULT
+    )
+    if(JAVA_HOME_RESULT EQUAL 0 AND JAVA_HOME_AUTO)
+        set(ENV{JAVA_HOME} "${JAVA_HOME_AUTO}")
+        message(STATUS "Auto-detected JAVA_HOME=${JAVA_HOME_AUTO}")
+    endif()
+endif()
+
+# Locate JNI (uses JAVA_HOME if set, falls back to system search)
 find_package(JNI REQUIRED)
 include_directories(${JNI_INCLUDE_DIRS})
 

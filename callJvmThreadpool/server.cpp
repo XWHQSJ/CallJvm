@@ -65,15 +65,16 @@ int main(int argc, char const *argv[])
     char* dbn;
     char delims[] = "$";
     char *res = nullptr;
+    char *saveptr = nullptr;
     std::vector<char*> resvec;
 
     printf("%zu\n", strlen(buffer));
 
-    res = strtok(buffer, delims);
+    res = strtok_r(buffer, delims, &saveptr);
     while (res != nullptr)
     {
         resvec.push_back(res);
-        res = strtok(nullptr, delims);
+        res = strtok_r(nullptr, delims, &saveptr);
     }
 
     psql = resvec[0];

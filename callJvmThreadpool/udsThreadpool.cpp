@@ -130,12 +130,13 @@ static void handle_client(JVM* myJvm, int client_fd) {
     char* psql = nullptr;
     char* dbn = nullptr;
     char delims[] = "$";
+    char* saveptr = nullptr;
     std::vector<char*> resvec;
 
-    char* res = strtok(buf, delims);
+    char* res = strtok_r(buf, delims, &saveptr);
     while (res != nullptr) {
         resvec.push_back(res);
-        res = strtok(nullptr, delims);
+        res = strtok_r(nullptr, delims, &saveptr);
     }
 
     if (resvec.size() < 2) {

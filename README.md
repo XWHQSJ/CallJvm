@@ -29,61 +29,18 @@ A socket-based server variant accepts work over TCP so external clients can trig
 - **Release automation** -- prebuilt binaries for macOS arm64 and Linux x64 on tag push
 - **Security** -- `SECURITY.md` with responsible disclosure policy
 
-## Project Structure
-
-```
-callJvmThreadpool/
-  CMakeLists.txt            # CMake build definition
-  tpool.h / tpool.cpp       # C-style thread pool (POSIX pthreads)
-  threadpool.h              # Modern C++ thread pool (header-only)
-  jni_util.h                # JNI exception checking helper
-  jni_guard.h               # RAII guards for JVM and JNI env
-  frame.h / frame.cpp       # Length-prefixed framing protocol
-  socketThreadpool.cpp      # TCP socket server + C thread pool + JNI (main target)
-  udsThreadpool.cpp         # Unix Domain Socket server + C++ pool + framing + JNI
-  socketMultithread.cpp     # TCP socket server + raw pthreads + JNI
-  pureMultithread.cpp       # Standalone multithreaded JNI example
-  main.cpp                  # Minimal single-thread JNI test
-  benchmark.cpp             # Dispatch overhead benchmark
-  server.cpp                # Standalone socket server
-  client.cpp                # Socket client for testing
-  test.cpp                  # Misc test code
-  java/                     # Java examples
-    build.sh                # Build script for Java classes
-    src/com/xwhqsj/example/
-      SqlEcho.java          # SQL-echo demo (parses SELECT, returns structured result)
-  qin_test.jar              # Legacy test Java classes
-  qin_test1.jar             # Legacy test Java classes (alternate)
-tests/
-  CMakeLists.txt
-  tpool_test.cpp            # GoogleTest tests for tpool + parsing
-fuzz/
-  fuzz_frame.cpp            # libFuzzer target for frame parser
-benchmarks/
-  results.md                # Benchmark measurement template
-.github/workflows/
-  ci.yml                    # CI: build, test, sanitizers (ASan/UBSan/TSan), fuzz
-  release.yml               # Release: prebuilt binaries on tag push
-  codeql.yml                # CodeQL static analysis
-.github/
-  dependabot.yml            # Weekly GitHub Actions dependency updates
-SECURITY.md                 # Security policy and responsible disclosure
-```
-
 ## Requirements
 
 - C++17 compiler (GCC, Clang, or MSVC)
 - CMake 3.15+
-- JDK with `JAVA_HOME` set (JNI headers and `libjvm` must be findable by CMake)
+- JDK installed (CMake auto-detects on macOS via `/usr/libexec/java_home`; on Linux set `JAVA_HOME` if not in standard path)
 - Linux or macOS (POSIX sockets, pthreads)
 
 ## Build
 
 ```bash
-# macOS: ensure JAVA_HOME is set
-export JAVA_HOME=$(/usr/libexec/java_home)
-
-# Configure and build
+# macOS: JAVA_HOME is auto-detected by CMake — no setup needed
+# Linux: ensure JAVA_HOME points to JDK if not in default path
 cmake -B build -S callJvmThreadpool
 cmake --build build -j
 ```
@@ -185,10 +142,7 @@ Test coverage:
 
 ## Limitations
 
-- **Single JVM shared across threads**: all worker threads must call `AttachCurrentThread` before JNI operations and `DetachCurrentThread` after. The `JniEnvGuard` RAII wrapper handles this automatically.
-- **JVM is single-instance per process**: JNI spec allows only one `JNI_CreateJavaVM` call per process.
-- **strtok is not thread-safe**: the message parsing uses `strtok` on stack-local buffers, which is safe per-thread but the pattern is fragile. The UDS variant with framing is preferred.
-- **macOS build note**: `JAVA_HOME` must be set. Use `export JAVA_HOME=$(/usr/libexec/java_home)`. If the JDK is not installed, the build will fail at `find_package(JNI)`. The CI matrix covers Linux with Temurin JDK 17 and 21.
+- **JVM is single-instance per process**: the JNI spec allows only one `JNI_CreateJavaVM` call per process. This is a hard runtime constraint and cannot be worked around — multiple JVM instances require separate processes (with the UDS variant providing a clean IPC bridge between them).
 
 ## Design Notes
 

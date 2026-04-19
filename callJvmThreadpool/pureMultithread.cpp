@@ -60,13 +60,14 @@ void* handle_stream(void* args)
     char* dbn;
     char delims[] = "$";
     char *res = nullptr;
+    char *saveptr = nullptr;
     std::vector<char*> resvec;
 
-    res = strtok(buf, delims);
+    res = strtok_r(buf, delims, &saveptr);
     while (res != nullptr)
     {
         resvec.push_back(res);
-        res = strtok(nullptr, delims);
+        res = strtok_r(nullptr, delims, &saveptr);
     }
 
     if (resvec.size() < 2) {
