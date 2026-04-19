@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            arch: x64
+            label: linux-x64
+          - os: macos-14
+            arch: arm64
+            label: macos-arm64
+    runs-on: ${{ matrix.os }}
+    name: release-${{ matrix.label }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+
+      - name: Configure CMake (Release)
+        run: |
+          cmake -B build -S callJvmThreadpool \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCALLJVM_BUILD_TESTS=OFF
+
+      - name: Build all targets
+        run: |
+          cmake --build build -j$(nproc 2>/dev/null || sysctl -n hw.logicalcpu) \
+            --target main socket_multithread pure_multithread server client benchmark uds_threadpool
+
+      - name: Rename binaries
+        run: |
+          mkdir -p dist
+          for target in main socket_multithread pure_multithread server client benchmark uds_threadpool; do
+            if [ -f "build/$target" ]; then
+              cp "build/$target" "dist/calljvm-${target}-${{ matrix.label }}"
+            fi
+          done
+
+      - name: Build Java example
+        run: |
+          cd callJvmThreadpool/java && bash build.sh && cd ../..
+          cp callJvmThreadpool/java/sqlecho.jar dist/sqlecho.jar
+
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
