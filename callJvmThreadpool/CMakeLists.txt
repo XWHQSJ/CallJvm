@@ -67,3 +67,12 @@ if(CALLJVM_BUILD_TESTS)
     enable_testing()
     add_subdirectory(../tests tests)
 endif()
+
+# --- libFuzzer target (optional, requires Clang) ---
+option(ENABLE_FUZZ "Build libFuzzer targets" OFF)
+if(ENABLE_FUZZ)
+    add_executable(fuzz_frame ../fuzz/fuzz_frame.cpp frame.cpp)
+    target_include_directories(fuzz_frame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_compile_options(fuzz_frame PRIVATE -fsanitize=fuzzer,address -fno-omit-frame-pointer)
+    target_link_options(fuzz_frame PRIVATE -fsanitize=fuzzer,address)
+endif()

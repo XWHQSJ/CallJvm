@@ -43,3 +43,14 @@ replay_pid*.log
 # Windows
 Thumbs.db
 Desktop.ini
+
+# Java build output
+callJvmThreadpool/java/out/
+callJvmThreadpool/java/sqlecho.jar
+
+# Fuzz artifacts
+fuzz_corpus/
+fuzz_artifacts/
+
+# Claude state
+.claude/
