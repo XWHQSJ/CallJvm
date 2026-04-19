@@ -45,6 +45,10 @@ target_link_libraries(server PRIVATE Threads::Threads)
 # Socket client
 add_executable(client client.cpp)
 
+# Benchmark
+add_executable(benchmark ${TPOOL_SOURCES} benchmark.cpp)
+target_link_libraries(benchmark PRIVATE Threads::Threads)
+
 # --- Tests (optional, requires GoogleTest) ---
 option(CALLJVM_BUILD_TESTS "Build tests" ON)
 if(CALLJVM_BUILD_TESTS)
