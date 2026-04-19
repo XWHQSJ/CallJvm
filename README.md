@@ -13,28 +13,44 @@ A socket-based server variant accepts work over TCP so external clients can trig
 
 ## Features
 
-- **Thread pool** (`tpool.c/h`) -- lightweight C-style POSIX thread pool with work queue
+- **Thread pool** (`tpool.cpp/h`) -- lightweight C-style POSIX thread pool with work queue
+- **Modern C++ thread pool** (`threadpool.h`) -- header-only pool using `std::thread`, `std::mutex`, `std::condition_variable`, `std::queue<std::function<void()>>`; includes C API compatibility wrappers
 - **Multithreaded JVM invocation** -- `AttachCurrentThread` / `DetachCurrentThread` for safe concurrent access
 - **Socket server** -- TCP listener that dispatches incoming requests to the thread pool
-- **Pure multithread baseline** -- standalone multithreaded JVM example for comparison
-- **Unix Domain Socket note** -- the project README records a later realization that UDS-based IPC is more practical than JNI for production use
+- **Unix Domain Socket variant** (`udsThreadpool.cpp`) -- `AF_UNIX`/`SOCK_STREAM` IPC with length-prefixed framing for lower overhead than TCP
+- **Length-prefixed framing** (`frame.h/cpp`) -- 4-byte big-endian length prefix for reliable message boundaries
+- **RAII guards** (`jni_guard.h`) -- `JvmGuard` and `JniEnvGuard` for exception-safe JVM/thread lifecycle
+- **JNI exception helper** (`jni_util.h`) -- `jni_check()` called after every JNI operation for reliable error reporting
+- **Benchmark** (`benchmark.cpp`) -- `std::chrono` timing harness comparing dispatch strategies
+- **Tests** -- GoogleTest suite for thread pool and message parsing
+- **CI** -- GitHub Actions matrix with Temurin JDK 17 + 21
 
 ## Project Structure
 
 ```
 callJvmThreadpool/
   CMakeLists.txt            # CMake build definition
-  tpool.h / tpool.cpp       # Thread pool implementation
-  socketThreadpool.cpp      # Socket server + thread pool + JNI (main target)
-  socketMultithread.cpp     # Socket server + raw pthreads + JNI
+  tpool.h / tpool.cpp       # C-style thread pool (POSIX pthreads)
+  threadpool.h              # Modern C++ thread pool (header-only)
+  jni_util.h                # JNI exception checking helper
+  jni_guard.h               # RAII guards for JVM and JNI env
+  frame.h / frame.cpp       # Length-prefixed framing protocol
+  socketThreadpool.cpp      # TCP socket server + C thread pool + JNI (main target)
+  udsThreadpool.cpp         # Unix Domain Socket server + C++ pool + framing + JNI
+  socketMultithread.cpp     # TCP socket server + raw pthreads + JNI
   pureMultithread.cpp       # Standalone multithreaded JNI example
   main.cpp                  # Minimal single-thread JNI test
+  benchmark.cpp             # Dispatch overhead benchmark
   server.cpp                # Standalone socket server
   client.cpp                # Socket client for testing
   test.cpp                  # Misc test code
-  jni.h / jni_md.h          # Vendored JNI headers (Linux)
   qin_test.jar              # Test Java classes
   qin_test1.jar             # Test Java classes (alternate)
+tests/
+  CMakeLists.txt
+  tpool_test.cpp            # GoogleTest tests for tpool + parsing
+.github/workflows/
+  ci.yml                    # CI pipeline
 ```
 
 ## Requirements
@@ -46,18 +62,28 @@ callJvmThreadpool/
 
 ## Build
 
-Out-of-source build:
-
 ```bash
-cmake -S callJvmThreadpool -B build
-cmake --build build
+# macOS: ensure JAVA_HOME is set
+export JAVA_HOME=$(/usr/libexec/java_home)
+
+# Configure and build
+cmake -B build -S callJvmThreadpool
+cmake --build build -j
 ```
 
-CMake will locate JNI via `find_package(JNI REQUIRED)`, so make sure `JAVA_HOME` points to your JDK installation.
+CMake will locate JNI via `find_package(JNI REQUIRED)`.
+
+## Configuration
+
+Set `CALLJVM_CLASSPATH` to point to your jar files:
+
+```bash
+export CALLJVM_CLASSPATH="./qin_test1.jar:./qin_test.jar"
+```
+
+If not set, defaults to `"."` (current directory).
 
 ## Run
-
-Depending on which target was compiled (see `CMakeLists.txt` for the active `add_executable`):
 
 ```bash
 # Thread-pool socket server (default target)
@@ -65,11 +91,67 @@ Depending on which target was compiled (see `CMakeLists.txt` for the active `add
 
 # In another terminal, send a request
 ./build/client
+
+# Unix Domain Socket variant
+./build/uds_threadpool
 ```
 
-The server listens on port 8080. The client sends a `$`-delimited payload (plain SQL + DB name) and receives a response.
+The TCP server listens on port 8080. The UDS variant listens on `/tmp/calljvm.sock`. Both accept `$`-delimited payloads (plain SQL + DB name).
 
-For the standalone single-thread test (`main.cpp`), adjust the classpath in the source to point to your jar location, rebuild, and run directly.
+## Unix Domain Socket Variant
+
+The `uds_threadpool` target uses `AF_UNIX`/`SOCK_STREAM` instead of TCP. Benefits:
+
+- **Lower IPC overhead**: no TCP/IP stack processing, no port allocation
+- **No network exposure**: socket file is local-only, inherits filesystem permissions
+- **Better throughput for local IPC**: kernel-level shortcut avoids serialization/checksumming
+- **Length-prefixed framing**: 4-byte big-endian length header ensures reliable message boundaries (no delimiter-based parsing)
+
+Use this variant when the client and server are on the same machine.
+
+## Benchmarks
+
+Run the dispatch overhead benchmark:
+
+```bash
+./build/benchmark [iterations]
+```
+
+Example output (100 iterations, 6 pool threads):
+
+```
+=== CallJvm Dispatch Benchmark ===
+Iterations: 100, Pool threads: 6
+
+Strategy                                   Total (ms)     Avg (us)
+---------------------------------------- ------------ ------------
+tpool (C threadpool)                             1.23        12.30
+raw pthreads (create+join per task)              8.45        84.50
+std::thread (create+join per task)               7.91        79.10
+```
+
+The thread pool amortizes thread creation cost. Real JNI overhead (AttachCurrentThread + Java method call) is additional.
+
+## Tests
+
+Tests use GoogleTest (fetched automatically via CMake FetchContent):
+
+```bash
+cmake -B build -S callJvmThreadpool -DCALLJVM_BUILD_TESTS=ON
+cmake --build build -j
+ctest --test-dir build --output-on-failure
+```
+
+Test coverage:
+- Thread pool: work items all execute, destroy joins correctly, null routine rejected
+- Message parsing: normal delimiters, missing delimiters, empty input
+
+## Limitations
+
+- **Single JVM shared across threads**: all worker threads must call `AttachCurrentThread` before JNI operations and `DetachCurrentThread` after. The `JniEnvGuard` RAII wrapper handles this automatically.
+- **JVM is single-instance per process**: JNI spec allows only one `JNI_CreateJavaVM` call per process.
+- **strtok is not thread-safe**: the message parsing uses `strtok` on stack-local buffers, which is safe per-thread but the pattern is fragile. The UDS variant with framing is preferred.
+- **macOS build note**: `JAVA_HOME` must be set. Use `export JAVA_HOME=$(/usr/libexec/java_home)`. If the JDK is not installed, the build will fail at `find_package(JNI)`. The CI matrix covers Linux with Temurin JDK 17 and 21.
 
 ## Design Notes
 
@@ -78,7 +160,8 @@ The project evolved through several stages:
 1. **Single JVM** (`main.cpp`) -- create a JVM, call a Java method, destroy the JVM. Simple but slow per call.
 2. **Multithread** (`pureMultithread.cpp`, `socketMultithread.cpp`) -- share one JVM across threads using `AttachCurrentThread`. Reduces JVM creation overhead.
 3. **Thread pool** (`socketThreadpool.cpp` + `tpool.*`) -- pre-spawn worker threads, reuse them for incoming socket connections. Avoids per-request thread creation.
-4. **UDS realization** -- invoking JNI still carries significant overhead per call. For production, the author notes that Unix Domain Sockets with file-backed data mapping is a more practical IPC strategy than embedding JNI directly.
+4. **Modern C++ pool** (`threadpool.h`) -- `std::thread`-based pool with `std::function<void()>` work items, replacing raw pthread + linked-list queue.
+5. **UDS + framing** (`udsThreadpool.cpp` + `frame.*`) -- Unix Domain Socket with length-prefixed protocol for local IPC, eliminating TCP overhead and delimiter parsing fragility.
 
 ## References
 
